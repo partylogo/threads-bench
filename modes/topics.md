@@ -51,6 +51,7 @@ bench 跑一次，會累積一批題材機會到 `benchmarks/opportunities.md`�
   - `[@handle](https://www.threads.com/@handle/post/<code>) — 414 讚 / 580 分享 — 一條規則配一件現成物（外套當靠山）`
   - 無永久連結的：`@handle（無永久連結，僅列數字）— 112 讚 / 119 分享 — 提問反轉（沒小人時迴紋針怎麼辦）`
   - 連結逐字從 opportunities.md 複製，不縮寫成「另 9 則」。佐證多就全列，這段的價值就是能點回去看
+  - 「為什麼排這裡」「借鏡什麼」裡如果點名某一篇，同樣附連結。整份輸出提到貼文就要有連結，這是 SKILL.md 原則 9
 - 借鏡什麼：<照 opportunities.md>
 - 延伸選項：<照 opportunities.md；空的寫「照打法寫就好」>
 - 為什麼排這裡：<一句話，只講信心跟佐證數>
