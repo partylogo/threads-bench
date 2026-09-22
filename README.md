@@ -1,6 +1,6 @@
 # threads-bench
 
-給 Claude Code 跟 Claude Desktop（Cowork）用的 Threads 對標 skill。
+給 Claude Code 跟 Claude 用的 Threads 對標 skill。
 
 我自己經營 Threads 帳號時最常卡的一件事：題目想不出來，或是寫了一篇覺得應該會中，結果沒中。這兩件事靠自己的歷史資料都解不了，因為你沒寫過的題目，資料裡永遠不會出現。
 
