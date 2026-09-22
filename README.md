@@ -6,9 +6,9 @@ Threads 同題對標 skill，給 Claude Code 與 Claude Desktop（Cowork）用�
 
 | 檔案 | 內容 | 什麼時候看 |
 |---|---|---|
-| `benchmarks/opportunities.md` | 題材機會清單：哪些題有人問沒人答、哪些題別人寫爆了你還沒寫 | 想不到要寫什麼的時候 |
+| `benchmarks/opportunities.md` | 題材機會清單：哪些題有人問沒人答、哪些題別人寫爆了你還沒寫 | 想不到要寫什麼時，打 `/threads-bench topics` 幫你挑 |
 | `benchmarks/playbook.md` | 打法手冊：形式、發文時間、手法，不含題材 | 動筆之前 |
-| `benchmarks/reports/<日期>-<主題>.md` | 完整報告，人看的 | 想知道它為什麼這樣建議 |
+| `benchmarks/reports/<日期>-<主題>.md` | 完整報告，人看的。每則提到的貼文都附原文連結，點得回去查 | 想知道它為什麼這樣建議 |
 
 它學的是**別人做了什麼事**（形式、切角、檔期、有沒有配圖），不是**別人怎麼寫**（句式、用字）。文字照抄會被演算法判成重複內容，這個 skill 有一條紅線專門擋這件事。
 
@@ -50,9 +50,28 @@ Threads 同題對標 skill，給 Claude Code 與 Claude Desktop（Cowork）用�
                              第二段：這次的 Top 5
 ```
 
-之後想從累積的機會裡挑題，打 `/threads-bench topics`，它會跨所有 bench 過的題目挑 Top 5，不用再開瀏覽器。
+挑題用 `/threads-bench topics`，見下面「怎麼用」。
 
 **不需要事先準備任何資料。** 它不看你自己的貼文、不看你的帳號調性，只看別人之間誰的打法效率高。建議合不合你的帳號、這題你寫過沒有，由你自己判斷。
+
+## 怎麼用
+
+```
+/threads-bench 中元節
+/threads-bench https://www.threads.com/@某帳號/post/xxxx 這篇為什麼輸
+/threads-bench topics
+```
+
+前兩種是跑一次 bench。報告分兩段：
+
+1. 這次 bench 的整理（誰做得好、打法、被淘汰的建議）
+2. 這次的 Top 5 可發展的主題，從這次找到的機會裡排出最值得寫的，最多 5 個
+
+第三種不抓資料，把你跑過的所有 bench 累積的機會攤開，挑出現在最值得寫的 5 個，不用再開瀏覽器。太舊的會標「建議重跑 bench」。
+
+第一次跑會問你要**低 token 版**（15 則樣本、報告精簡，快而便宜）還是**高 token 版**（25 則、逐帳號算基線、報告完整，慢而貴）。
+
+跑完看 `benchmarks/reports/` 裡的報告。之後想寫文，先翻 `opportunities.md` 挑題，再翻 `playbook.md` 看打法。
 
 ---
 
@@ -156,28 +175,13 @@ Windows：clone 之後對資料夾按右鍵 → 壓縮成 ZIP 檔案。
 
 ---
 
-## 怎麼用
-
-```
-/threads-bench 幫我 bench 中元節
-/threads-bench https://www.threads.com/@某帳號/post/xxxx 這篇為什麼輸
-/threads-bench topics
-```
-
-前兩種是跑一次對標。報告分兩段：先是這次 bench 的整理（誰做得好、打法、被淘汰的建議），再來是這次的 Top 5，從這次找到的機會裡排出最值得寫的，最多 5 個。
-
-第三種不抓資料，把你跑過的所有 bench 累積的機會攤開，挑出現在最值得寫的 5 個。太舊的會標「建議重跑 bench」。
-
-第一次跑會問你要**低 token 版**（15 則樣本、報告精簡，快而便宜）還是**高 token 版**（25 則、逐帳號算基線、報告完整，慢而貴）。
-
-跑完看 `benchmarks/reports/` 裡的報告。之後想寫文，先翻 `opportunities.md` 挑題，再翻 `playbook.md` 看打法。
-
 ## 它不做什麼
 
 - 不幫你寫文。它只給題材和打法，怎麼寫是你的事。
 - 不抄別人的文字。句式、開場、用字一律不進建議。
 - 不出 threads.com。不碰私人帳號、不碰私訊、不繞登入牆。
 - 不碰你工作目錄裡的其他檔案。只寫 `benchmarks/`。
+- 不寫沒有連結的參照。報告裡提到的每一則貼文都附原文連結，抓不到連結的會明講「無永久連結」。
 
 ---
 
