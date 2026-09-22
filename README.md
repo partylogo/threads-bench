@@ -44,8 +44,13 @@ Threads 同題對標 skill，給 Claude Code 與 Claude Desktop（Cowork）用�
         │                    被淘汰的也寫進報告，不默默刪
         ▼
 ⑦ 寫檔 ──────────────────── opportunities.md / playbook.md / reports/ / index.jsonl
-                             全部在 benchmarks/ 底下，不碰你其他檔案
+        │                    全部在 benchmarks/ 底下，不碰你其他檔案
+        ▼
+⑧ 報告 ──────────────────── 第一段：這次 bench 的整理
+                             第二段：這次的 Top 5
 ```
+
+之後想從累積的機會裡挑題，打 `/threads-bench topics`，它會跨所有 bench 過的題目挑 Top 5，不用再開瀏覽器。
 
 **不需要事先準備任何資料。** 它不看你自己的貼文、不看你的帳號調性，只看別人之間誰的打法效率高。建議合不合你的帳號、這題你寫過沒有，由你自己判斷。
 
@@ -110,6 +115,7 @@ Cowork 有內建瀏覽器，不用裝擴充功能。
 threads-bench.zip
 └── threads-bench/
     ├── SKILL.md
+    ├── modes/
     ├── knowledge/
     ├── scripts/
     └── templates/
@@ -155,7 +161,12 @@ Windows：clone 之後對資料夾按右鍵 → 壓縮成 ZIP 檔案。
 ```
 /threads-bench 幫我 bench 中元節
 /threads-bench https://www.threads.com/@某帳號/post/xxxx 這篇為什麼輸
+/threads-bench topics
 ```
+
+前兩種是跑一次對標。報告分兩段：先是這次 bench 的整理（誰做得好、打法、被淘汰的建議），再來是這次的 Top 5，從這次找到的機會裡排出最值得寫的，最多 5 個。
+
+第三種不抓資料，把你跑過的所有 bench 累積的機會攤開，挑出現在最值得寫的 5 個。太舊的會標「建議重跑 bench」。
 
 第一次跑會問你要**低 token 版**（15 則樣本、報告精簡，快而便宜）還是**高 token 版**（25 則、逐帳號算基線、報告完整，慢而貴）。
 
@@ -174,7 +185,8 @@ Windows：clone 之後對資料夾按右鍵 → 壓縮成 ZIP 檔案。
 
 ```
 threads-bench/
-├── SKILL.md                    主流程
+├── SKILL.md                    主流程（bench）
+├── modes/topics.md             從累積的機會裡挑 Top 5 的規則
 ├── knowledge/
 │   ├── red-lines.md            演算法紅線（R）與正向訊號（S）定義
 │   └── data-confidence.md      佐證強度分級

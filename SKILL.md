@@ -1,6 +1,6 @@
 ---
 name: threads-bench
-description: "Threads 同題對標：給一個主題或一則貼文連結，到 Threads 上找出同一題別人怎麼做、效果如何，整理成題材機會清單與打法手冊。觸發詞：'bench'、'對標'、'benchmark'、'別人怎麼做'、'同題研究'、'競品分析'、'這篇為什麼輸'。不看 user 自己的任何資料，純看別人。"
+description: "Threads 同題對標：給一個主題或一則貼文連結，到 Threads 上找出同一題別人怎麼做、效果如何，整理成題材機會清單與打法手冊。bench 跑完會直接附這次的 Top 5；單獨打 `topics` 則從所有累積的機會裡挑 Top 5。觸發詞：'bench'、'對標'、'benchmark'、'別人怎麼做'、'同題研究'、'競品分析'、'這篇為什麼輸'、'topics'、'選題'。不看 user 自己的任何資料，純看別人。"
 version: "1.0.0"
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
@@ -19,6 +19,18 @@ skill 自己的檔案用 Glob 找，路徑相對於 skill 根目錄：
 - `**/threads-bench/knowledge/data-confidence.md`：佐證強度分級
 - `**/threads-bench/templates/FAILSAFE.md`：寫檔安全規則
 - `**/threads-bench/scripts/safe_write.py`：安全寫檔腳本
+- `**/threads-bench/modes/topics.md`：從累積的機會裡挑 Top 5 的規則。bench 報告第二段與 `topics` 指令共用
+
+---
+
+## 兩種指令
+
+| 打法 | 做什麼 | 照哪份走 |
+|---|---|---|
+| `/threads-bench <主題或貼文連結>` | 跑一次對標。報告分兩段：這次 bench 的整理、這次的 Top 5 | 本檔 Step 0 到 6，第二段照 `modes/topics.md` |
+| `/threads-bench topics` | 不抓資料。從 `opportunities.md` 所有 open 的機會裡挑 Top 5 | 只讀 `modes/topics.md`，跳過 Step 0 到 6 |
+
+參數是 `topics`（或「選題」「挑題」）就走第二條。其他一律當主題或連結，走第一條。
 
 ---
 
@@ -30,7 +42,7 @@ skill 自己的檔案用 Glob 找，路徑相對於 skill 根目錄：
 4. **不強制產出新角度。** 單純借鏡打法寫自己的題材，是完整的選擇。硬掰出來的「創新角度」通常比照著做更差。
 5. **對標表現再好，也不能推翻紅線。** 建議必須先過 `red-lines.md`，不合的直接淘汰並寫明理由。
 6. **誠實降級。** 資料薄就說薄。用 `data-confidence.md` 的等級標示，不要把弱訊號講成結論。
-7. **範圍只限本次主題。** 不掃庫裡其他主題的機會、不做跨主題的去留判斷。
+7. **範圍只限本次主題。** 不掃庫裡其他主題的機會、不做跨主題的去留判斷。唯一例外是 `topics` 指令，它的工作就是跨主題挑，但只挑不改。
 8. **跟著 user 的語言走。** user 用中文就用中文，內部 ID 第一次出現時用白話解釋。
 
 ---
@@ -269,6 +281,15 @@ window:        2026-08-01 ~ 2026-08-08
 
 `samples_no_permalink` 記這一批有幾則沒拿到貼文永久連結。這個數字持續偏高，代表 Step 1 的取連結那一步在漏，不是題材難找。
 
+#### 報告固定兩段
+
+`reports/<date>-<topic_id>.md` 與對話裡的回覆都分兩段，順序固定：
+
+1. **這次 bench 的整理**：主題定義、樣本數與來源、誰做得好與為什麼（附正規化數字與發文時距）、打法觀察、被守門淘汰的建議與理由、資料薄弱處。
+2. **這次的 Top 5**：照 `modes/topics.md` 的排序規則，**範圍只限本次 `topic_id`** 寫進 `opportunities.md` 的機會。最多 5 個，有幾個列幾個。
+
+第二段是第一段的結論，不是另一次分析。它只重排本次的機會，不重新抓、不重新守門。
+
 **這個 skill 不直接產草稿。** 報告結尾告訴 user 機會清單與打法手冊在哪，由 user 決定接下來怎麼寫。
 
 ---
@@ -351,6 +372,10 @@ window:        2026-08-01 ~ 2026-08-08
 ### user 沒有 `benchmarks/` 目錄
 
 第一次執行時建立，並寫入三個檔的骨架。不要因為缺目錄就中止。
+
+### 單獨打 `topics` 但還沒跑過 bench
+
+`opportunities.md` 不存在或沒有 open 的機會：直接說「還沒有 bench 結果，先跑一次 `/threads-bench <主題>`」。不開瀏覽器、不空手生推薦。
 
 ### 樣本太薄（跑完所有來源仍 < 8 則）
 
