@@ -1,0 +1,204 @@
+# threads-bench
+
+Threads 同題對標 skill，給 Claude Code 與 Claude Desktop（Cowork）用。
+
+你給它一個主題（「幫我 bench 中元節」）或一則 Threads 貼文連結，它會開瀏覽器上 Threads，找同一題別人怎麼寫、效果怎麼樣，然後整理成三份你可以直接用的東西：
+
+| 檔案 | 內容 | 什麼時候看 |
+|---|---|---|
+| `benchmarks/opportunities.md` | 題材機會清單：哪些題有人問沒人答、哪些題別人寫爆了你還沒寫 | 想不到要寫什麼的時候 |
+| `benchmarks/playbook.md` | 打法手冊：形式、發文時間、手法，不含題材 | 動筆之前 |
+| `benchmarks/reports/<日期>-<主題>.md` | 完整報告，人看的 | 想知道它為什麼這樣建議 |
+
+它學的是**別人做了什麼事**（形式、切角、檔期、有沒有配圖），不是**別人怎麼寫**（句式、用字）。文字照抄會被演算法判成重複內容，這個 skill 有一條紅線專門擋這件事。
+
+---
+
+## 它是怎麼運作的
+
+```
+你：「幫我 bench 中元節」  或  貼一個 Threads 連結
+        │
+        ▼
+① 定義主題 ─────────────── 先問你：核心詞是什麼、相關場所／載體是什麼、要排除什麼
+        │                    例：核心詞「中元節、普渡」，場所詞「基隆中元祭、家樂福普渡」
+        │                    你確認過才往下，避免撈到一堆不相關的
+        ▼
+② 開瀏覽器抓資料 ────────── 只在 threads.com 站內
+        │                    關鍵字搜尋 → 長尾複合詞 → tag 頁 → 你指定的種子帳號
+        │                    抓 15 到 25 則，每則都要拿到貼文的永久連結
+        ▼
+③ 算相對表現 ────────────── 對每個帳號開 profile 看粉絲數、近 5 篇平均讚數
+        │                    算「這篇 ÷ 他自己的平均」
+        │                    → 145 粉絲的帳號拿到 506 讚，那是題目對，不是帳號大
+        ▼
+④ 歸類成機會 ────────────── 空白型（有人問沒人答）
+        │                    熱區型（別人寫爆了，你還沒寫）
+        │                    半成品型（別人只答了一半）
+        │                    每個機會標信心：3 則以上佐證才算 Usable
+        ▼
+⑤ 跟上次結果比對 ────────── 同一則貼文再出現就更新數字
+        │                    結論互相矛盾就兩邊都留，不自動裁決
+        ▼
+⑥ 守門 ──────────────────── 每個建議過三關：
+        │                    演算法紅線（不能建議「留言+1」這類互動誘導）
+        │                    你的帳號聲音（你說過不做的事不推薦）
+        │                    你寫過沒有
+        │                    被淘汰的也寫進報告，不默默刪
+        ▼
+⑦ 寫檔 ──────────────────── opportunities.md / playbook.md / reports/ / index.jsonl
+                             全部在 benchmarks/ 底下，不碰你其他檔案
+```
+
+**不需要事先建資料庫。** 沒有你自己的貼文資料，它就走「無基準模式」，只比別人之間誰的打法效率高。想多做「我 vs 他」的對照，在工作目錄放一份 `my_posts.md`（貼文 + 讚／留言／分享數），或直接在對話裡貼。
+
+---
+
+## 安裝
+
+先確認你是用哪一種 Claude：
+
+```
+你在哪裡跟 Claude 對話？
+  ├─ 終端機（打 claude 指令）        → 看「Claude Code」
+  ├─ VS Code 裡的 Claude 擴充功能    → 看「Claude Code」，瀏覽器不用加 --chrome
+  └─ Claude 桌面 App 的 Cowork 模式  → 看「Claude Desktop」
+```
+
+### Claude Code
+
+#### macOS / Linux
+
+```bash
+git clone https://github.com/partylogo/threads-bench.git ~/.claude/skills/threads-bench
+```
+
+重開 Claude Code，打 `/threads-bench` 看有沒有出現。
+
+#### Windows
+
+在 PowerShell：
+
+```powershell
+git clone https://github.com/partylogo/threads-bench.git "$env:USERPROFILE\.claude\skills\threads-bench"
+```
+
+**要在原生 Windows 跑，不要在 WSL 裡。** WSL 不支援 Claude Code 的 Chrome 整合。
+
+#### 只裝給某一個專案
+
+不想全域安裝，clone 到專案底下的 `.claude/skills/threads-bench/` 也可以，只有在那個專案開 Claude Code 才會看到。
+
+#### 接瀏覽器（Claude Code 必做）
+
+1. Chrome（或 Edge、Brave、Arc）裝 [Claude in Chrome](https://chromewebstore.google.com/detail/claude/fcoeoabgfenejglbffodgkkbkcdhcgfn) 擴充功能，版本 1.0.36 以上。
+2. 在 Chrome 裡登入 Threads。搜尋頁沒登入會撞登入牆，什麼都抓不到。
+3. 啟動時加旗標：`claude --chrome`。或在 Claude Code 裡打 `/chrome`，選 **Enabled by default**，之後就不用加。
+4. 第一次操作 threads.com 會問權限，選允許整個站台。
+
+限制：
+
+- 需要 Pro / Max / Team / Enterprise 方案，並且用 `/login` 登入。用 API key 登入的帳號不能用瀏覽器。
+- 透過 Bedrock、Vertex 這類第三方平台用 Claude 的，也不能用瀏覽器。
+
+### Claude Desktop（Cowork）
+
+Cowork 有內建瀏覽器，不用裝擴充功能。
+
+#### 1. 打包 skill
+
+把整個資料夾壓成 zip。SKILL.md 要在資料夾的第一層：
+
+```
+threads-bench.zip
+└── threads-bench/
+    ├── SKILL.md
+    ├── knowledge/
+    ├── scripts/
+    └── templates/
+```
+
+macOS / Linux：
+
+```bash
+git clone https://github.com/partylogo/threads-bench.git
+zip -r threads-bench.zip threads-bench -x "*.git*"
+```
+
+Windows：clone 之後對資料夾按右鍵 → 壓縮成 ZIP 檔案。
+
+或者直接到這個 repo 的 **Code → Download ZIP**，GitHub 給的 zip 解開後資料夾會叫 `threads-bench-main`，改名成 `threads-bench` 再壓一次。
+
+#### 2. 上傳
+
+1. 打開 Claude Desktop，Settings → Capabilities，確認 **Code execution** 是開的。
+2. Customize → Skills → 「+」 → Upload a skill，選剛剛的 zip。
+3. 上傳完在 Skills 清單裡把它開啟。
+
+#### 3. 接瀏覽器
+
+1. Settings → Cowork → **Preferred browser**，選內建瀏覽器（或 Claude in Chrome，兩個都能用）。
+2. 第一次跑之前，先在內建瀏覽器登入 Threads。做法是叫 Claude「打開 threads.com」，瀏覽器會開在側欄，你在裡面登入。或從 Chrome 匯入登入狀態（一次性，可以挑只匯入 threads.com）。
+3. Cowork 需要指定一個工作資料夾，`benchmarks/` 會寫在那裡面。
+
+限制：
+
+- 內建瀏覽器 2026 年 8 月底開始開放 Pro / Max / Team，Enterprise 要管理員開。
+- 內建瀏覽器暴露給 skill 的工具名稱沒有公開文件，skill 是靠「有 navigate 跟 find 的那組工具」自動認的。如果跑起來說找不到瀏覽器工具，把 Claude 列出的工具名稱貼給我，補進 SKILL.md 那張表就好。
+
+### 共同需求
+
+- Python 3（安全寫檔腳本用，macOS 和多數 Linux 內建；Windows 到 python.org 裝，或 Cowork 的容器自己有）
+- Threads 帳號，並在瀏覽器裡登入
+
+---
+
+## 怎麼用
+
+```
+/threads-bench 幫我 bench 中元節
+/threads-bench https://www.threads.com/@某帳號/post/xxxx 這篇為什麼輸
+```
+
+第一次跑會問你要**低 token 版**（15 則樣本、報告精簡，快而便宜）還是**高 token 版**（25 則、逐帳號算基線、報告完整，慢而貴）。
+
+跑完看 `benchmarks/reports/` 裡的報告。之後想寫文，先翻 `opportunities.md` 挑題，再翻 `playbook.md` 看打法。
+
+### 可選設定
+
+工作目錄放 `peer_accounts.json`，指定固定要看的同領域帳號：
+
+```json
+{"accounts": ["@handle1", "@handle2"]}
+```
+
+工作目錄放 `brand_voice.md` 或任何寫著「這個帳號不做什麼」的檔案，skill 會拿來守門，不推薦你說過不做的事。
+
+---
+
+## 它不做什麼
+
+- 不幫你寫文。它只給題材和打法，怎麼寫是你的事。
+- 不抄別人的文字。句式、開場、用字一律不進建議。
+- 不出 threads.com。不碰私人帳號、不碰私訊、不繞登入牆。
+- 不碰你工作目錄裡的其他檔案。只寫 `benchmarks/`。
+
+---
+
+## 檔案結構
+
+```
+threads-bench/
+├── SKILL.md                    主流程
+├── knowledge/
+│   ├── red-lines.md            演算法紅線（R）與正向訊號（S）定義
+│   └── data-confidence.md      佐證強度分級
+├── templates/FAILSAFE.md       寫檔安全規則：先備份、原子寫入、保留 5 份
+└── scripts/
+    ├── safe_write.py           安全寫檔腳本
+    └── _atomic.py
+```
+
+## 來源
+
+從 [AK-Threads-Booster](https://github.com/akseolabs-seo/AK-Threads-booster) 的 `/bench` 模組抽出，拿掉對 tracker 與其他模組的依賴，改成可以單獨跑。
